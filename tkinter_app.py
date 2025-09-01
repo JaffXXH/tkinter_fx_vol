@@ -4,6 +4,37 @@
 
 Run: python fx_vol_app.py
 Creates/uses config.json in the same directory (auto-generated on first run).
+
+Given ATM, RR, and STR, the 25Δ call and put vols are reconstructed as:
+\sigma_{\text{25Δ Call}} = \sigma_{\text{ATM}} + \text{STR}_{25} + \frac{\text{RR}_{25}}{2}
+\sigma_{\text{25Δ Put}} = \sigma_{\text{ATM}} + \text{STR}_{25} - \frac{\text{RR}_{25}}{2}
+
+import matplotlib.pyplot as plt
+
+# --- Given FX vol metrics ---
+ATM = 0.10   # 10.0%
+RR  = 0.02   #  2.0%
+STR = 0.01   #  1.0%
+
+# --- Reconstruct 25Δ vols from ATM, RR, STR ---
+sigma_25Call = ATM + STR + RR / 2
+sigma_25Put  = ATM + STR - RR / 2
+
+# --- Define strikes and vols ---
+strikes = ['25Δ Put', 'ATM', '25Δ Call']
+vols    = [sigma_25Put, ATM, sigma_25Call]
+
+# --- Plot the smile ---
+plt.figure(figsize=(7, 4))
+plt.plot(strikes, vols, marker='o', linestyle='-', color='navy')
+plt.title('FX Option Smile Curve', fontsize=14)
+plt.xlabel('Strike (Delta Convention)', fontsize=12)
+plt.ylabel('Implied Volatility', fontsize=12)
+plt.ylim(min(vols) - 0.005, max(vols) + 0.005)
+plt.grid(True, linestyle='--', alpha=0.6)
+plt.show()
+
+
 """
 
 import os
@@ -722,4 +753,5 @@ class FXVolApp(tk.Tk):
 
 if __name__ == "__main__":
     app = FXVolApp()
+
     app.mainloop()
